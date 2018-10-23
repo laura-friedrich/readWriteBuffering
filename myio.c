@@ -9,7 +9,7 @@
 // Include our header file
 #include "myio.h"
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 1024
 
 
 int main(int argc, char *argv[])
@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
   //char *read_buffer = (char*) malloc (BUFFER_SIZE);
   printf("%d\n", myclose(myopen("path", O_CREAT)));
   char* contents[BUFFER_SIZE];
-  printf("%ld\n", myread(myopen("myio.c", O_RDONLY), contents, BUFFER_SIZE));
+  printf("%ld\n", myread(myopen(argv[1], O_RDONLY), contents, BUFFER_SIZE));
+  printf("%s\n", contents);
 }
 
 /* Accepts Flags:
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
   - O_TRUNC
 */
 
-// myread implementations 
+// myread implementations
 ssize_t myread(int fd, void *buf, size_t count){
   read(fd, buf, BUFFER_SIZE);
   return 0;
