@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
   - O_TRUNC
 */
 
+// myread implementations 
 ssize_t myread(int fd, void *buf, size_t count){
   read(fd, buf, BUFFER_SIZE);
   return 0;
