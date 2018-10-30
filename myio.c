@@ -9,30 +9,21 @@
 // Include our header file
 #include "myio.h"
 
-#define BUFFER_SIZE 1024
-
-
-struct FileStruct{
-  char *fileName;
-  char *fileBuffer[BUFFER_SIZE];
-  int fileDescriptor;
-  int startByte, endByte;
-};
-
 int main(int argc, char *argv[])
 {
-  //char *read_buffer = (char*) malloc (BUFFER_SIZE);
   struct FileStruct fileToTest;
   fileToTest.fileName = argv[1];
-  fileToTest.startByte = 0;
-  fileToTest.endByte = 0;
-  fileToTest.fileDescriptor = 0;
+  fileToTest.position = 0;
+  fileToTest.bufferWritten = 0;
   fileToTest.fileDescriptor = myopen(fileToTest.fileName, O_RDONLY);
 
-  printf("%d\n", myclose(myopen(fileToTest.fileName, O_CREAT)));
-  printf("%ld\n", myread(fileToTest, fileToTest.fileBuffer, BUFFER_SIZE));
-
-  //printf("%s\n", contents);
+  printf("Calling 'myopen' on %s, recieved int %d.\n",
+          fileToTest.fileName,
+          myopen(fileToTest.fileName, O_CREAT));
+  printf("Calling 'myread' on %s, recieved ssize_t %ld.\n",
+          fileToTest.fileName,
+          myread(&fileToTest, fileToTest.fileBuffer, BUFFER_SIZE));
+  printf("Has the buffer been written to? %d.\n", fileToTest.bufferWritten);
 }
 
 /* Accepts Flags:
@@ -44,12 +35,13 @@ int main(int argc, char *argv[])
 */
 
 // myread implementations
-ssize_t myread(struct FileStruct fd, void *buf, size_t count){
+ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
   // Current buffer not adequate, read a new chunk of file of 'BUFFER_SIZE'
-  if(fd.fileBuffer == NULL || (fd.endByte - fd.startByte) < BUFFER_SIZE){
-    printf("Calling system call read for file:\n%s", fd.fileName);
-    read(fd.fileDescriptor, fd.fileBuffer, BUFFER_SIZE);
-    printf("Contents of file: %s\n", fd.fileBuffer);
+  if(fd->bufferWritten == 0 || count + fd->position > BUFFER_SIZE){
+    printf("Calling system call read for file: %s.\n", fd->fileName);
+    read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    fd->bufferWritten = 1; // Now the buffer has been written
+    printf("Contents of file:\n\n%1024s\n\n", fd->fileBuffer);
   }
 
   return 0;
