@@ -7,24 +7,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 // Include our header file
-#include "myio.h"
-
-int main(int argc, char *argv[])
-{
-  struct FileStruct fileToTest;
-  fileToTest.fileName = argv[1];
-  fileToTest.position = 0;
-  fileToTest.bufferWritten = 0;
-  fileToTest.fileDescriptor = myopen(fileToTest.fileName, O_RDONLY);
-
-  printf("Calling 'myopen' on %s, recieved int %d.\n",
-          fileToTest.fileName,
-          myopen(fileToTest.fileName, O_CREAT));
-  printf("Calling 'myread' on %s, recieved ssize_t %ld.\n",
-          fileToTest.fileName,
-          myread(&fileToTest, fileToTest.fileBuffer, BUFFER_SIZE));
-  printf("Has the buffer been written to? %d.\n", fileToTest.bufferWritten);
-}
 
 /* Accepts Flags:
   - O_CREAT
@@ -44,11 +26,12 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
     printf("Contents of file:\n\n%1024s\n\n", fd->fileBuffer);
   }
 
-  return 0;
+  return 0; //Not always return 0. Return a different number based on success or fail
 }
 
 // Calls system call open
 int myopen(const char *fileName, int flags){
+
   return open(fileName, flags);
 }
 
