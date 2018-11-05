@@ -41,7 +41,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
     printf("Calling system call read for file: %s.\n", fd->fileName);
     read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
     fd->bufferWritten = 1; // Now the buffer has been written
-    printf("Contents of file:\n\n%1024s\n\n", fd->fileBuffer);
+    printf("Contents of file:\n\n%s\n\n", fd->fileBuffer);
   }
 
   return 0;
