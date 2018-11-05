@@ -31,7 +31,6 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
 
 // Calls system call open
 int myopen(const char *fileName, int flags){
-
   return open(fileName, flags);
 }
 
