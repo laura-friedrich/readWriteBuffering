@@ -10,5 +10,5 @@ myioTest: myioTest.o myio.o
 	gcc $(CFLAGS) -c -o $@ $^
 
 .PHONY: clean
-	clean:
+clean:
 	rm -f myioTest myioTest.o myio.o

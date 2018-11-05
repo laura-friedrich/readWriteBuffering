@@ -1,11 +1,5 @@
-#include <sys/types.h>
-#include <stdio.h>
-// Needed for open
-#include <fcntl.h>
-#include <sys/stat.h>
-// Needed for close, read
-#include <unistd.h>
-#include <stdlib.h>
+#include "myio.h"
+
 // Include our header file
 
 /* Accepts Flags:
@@ -23,15 +17,22 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
     printf("Calling system call read for file: %s.\n", fd->fileName);
     read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
     fd->bufferWritten = 1; // Now the buffer has been written
-    printf("Contents of file:\n\n%1024s\n\n", fd->fileBuffer);
+    printf("Contents of file:\n\n%s\n\n", fd->fileBuffer);
+    memcpy(fd->fileBuffer, buf, count);
   }
-
+  //memcpy to transfer into buf
   return 0; //Not always return 0. Return a different number based on success or fail
 }
 
 // Calls system call open
-int myopen(const char *fileName, int flags){
-  return open(fileName, flags);
+struct FileStruct* myopen(char *fileName, int flags){
+  struct FileStruct *fileStruct = malloc(sizeof(struct FileStruct));
+  fileStruct->fileName = fileName;
+  fileStruct->position = 0;
+  fileStruct->bufferWritten = 0;
+  fileStruct->flags = flags;
+  fileStruct->fileDescriptor = open(fileName, flags);
+  return fileStruct;
 }
 
 // Calls system call close
