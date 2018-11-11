@@ -14,11 +14,17 @@
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
   // Current buffer not adequate, read a new chunk of file of 'BUFFER_SIZE'
   if(fd->bufferWritten == 0 || count + fd->position > BUFFER_SIZE){
-    printf("Calling system call read for file: %s.\n", fd->fileName);
+    printf("Calling system call read for file: %s.\n\n", fd->fileName);
     read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    fd->position = fd->position+count;
     fd->bufferWritten = 1; // Now the buffer has been written
-    printf("Contents of file:\n\n%s\n\n", fd->fileBuffer);
-    memcpy(fd->fileBuffer, buf, count);
+    //printf("Contents of file:\n\n%s\n\n", fd->fileBuffer);
+    memcpy(buf, fd->fileBuffer, count);
+  }
+  else{
+    memcpy(buf, fd->fileBuffer+fd->position, count);
+    fd->position = fd->position+count;
+
   }
   //memcpy to transfer into buf
   return 0; //Not always return 0. Return a different number based on success or fail
