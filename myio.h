@@ -20,16 +20,24 @@ typedef struct FileStruct{
     char fileBuffer[BUFFER_SIZE];
     int bufferWritten; // Keeps track of if buffer has been filled or not
     int fileDescriptor;
-    int position;
+    int beginningBuff;
+    int endBuff;
+    int bufferOffset;
     int flags;
+    //int position;
+    //int bytesWritten;
 }FileStruct;
 
 //int myopen(struct File fd, int flags);
 struct FileStruct* myopen(char *pathname, int flags);
 
-int myclose(int fd);
+int myclose(struct FileStruct *fd);
+
+struct FileStruct* myflush(struct FileStruct *fd);
 
 //ssize_t myread(int fd, void *buf, size_t count);
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count);
+
+ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count);
 
 #endif
