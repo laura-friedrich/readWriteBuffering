@@ -31,12 +31,12 @@ int main(int argc, char *argv[])
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
 
   //Reading myio.h
-  myread(fileToTest2, bufferToReadTo2, 100);
+  //myread(fileToTest2, bufferToReadTo2, 100);
   //printf("file contents %s \n", (char *)bufferToReadTo2);
   //continue reading from the file but without calling another system call
-  myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
+  //myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
   //printf("file contents %s \n", (char *)bufferToReadTo2);
-  
+
   mywrite(fileToTest3, bufferToReadTo,100);
   mywrite(fileToTest3, bufferToReadTo,100);
   printf("hello\n");
