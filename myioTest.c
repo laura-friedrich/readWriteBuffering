@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
   myread(fileToTest, bufferToReadTo, 100);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
 
-  
+
   //continue reading from the file but without calling another system call
   myread(fileToTest, (char *)bufferToReadTo+100, 100);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
   //continue reading from the file but without calling another system call
   myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
-  printf("file contents %s \n", (char *)bufferToReadTo2);
+  //printf("file contents %s \n", (char *)bufferToReadTo2);
 
   mywrite(fileToTest3, bufferToReadTo2,2000);
 

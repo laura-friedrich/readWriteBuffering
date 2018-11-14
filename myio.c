@@ -49,7 +49,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count){
   }
 
 
-  return 0;
+  return 0;  //not sure what to return here
 
 }
 
@@ -93,7 +93,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
     fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
     fd->bufferOffset =0;
   }
-  return 0; 
+  return 0;  //not sure what to return here
 }
 
 
@@ -114,6 +114,12 @@ struct FileStruct* myopen(char *fileName, int flags){
 
 // Calls system call close
 int myclose(struct FileStruct *fd){
-  myflush(fd);
-  return close(fd->fileDescriptor);
+  if (fd->bufferWritten ==1) {
+    myflush(fd);
+  }
+
+
+  int returnVal = close(fd->fileDescriptor);
+  free(fd);
+  return returnVal;
 }
