@@ -14,34 +14,31 @@ int main(int argc, char *argv[])
   FileStruct *fileToTest = myopen("README", O_RDONLY);
 
   //Opening myio.h
-  FileStruct *fileToTest2 = myopen("myio.h", O_RDONLY);
+  FileStruct *fileToTest2 = myopen("myio.c", O_RDONLY);
 
   //Opening Test file to write to
   FileStruct *fileToTest3 = myopen("test", O_RDWR);
 
 
   //Reading README
-  printf("no segfault\n");
   myread(fileToTest, bufferToReadTo, 100);
-  //printf("hi");
-  //fflush(stdout);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
+
+  
   //continue reading from the file but without calling another system call
   myread(fileToTest, (char *)bufferToReadTo+100, 100);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
 
-  //Reading myio.h
-  //myread(fileToTest2, bufferToReadTo2, 100);
-  //printf("file contents %s \n", (char *)bufferToReadTo2);
-  //continue reading from the file but without calling another system call
-  //myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
-  //printf("file contents %s \n", (char *)bufferToReadTo2);
 
-  mywrite(fileToTest3, bufferToReadTo,100);
-  mywrite(fileToTest3, bufferToReadTo,100);
-  printf("hello\n");
-  fflush(stdout);
-  //myflush(fileToTest3);
+
+  //Reading myio.h
+  myread(fileToTest2, bufferToReadTo2, 2000);
+
+  //continue reading from the file but without calling another system call
+  myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
+  printf("file contents %s \n", (char *)bufferToReadTo2);
+
+  mywrite(fileToTest3, bufferToReadTo2,2000);
 
   myclose(fileToTest);
   myclose(fileToTest2);
