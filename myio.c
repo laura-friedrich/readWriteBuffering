@@ -14,29 +14,34 @@
 
 struct FileStruct* myflush(struct FileStruct *fd)  {
   fd->bufferWritten = 0;
-  write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+  write(fd->fileDescriptor, fd->fileBuffer, fd->bufferOffset);
   return fd;
 }
 
 //mywrite implementations
 ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
-
+  void *newBuf;
   fd->bufferWritten = 1;
   if(BUFFER_SIZE-fd->bufferOffset > count)  {
+    //printf("here\n" );
     memcpy(fd->fileBuffer+fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset+count;
   }
 
   else  {
     int countInBuf = BUFFER_SIZE-fd->bufferOffset;
+    //printf("%d\n",countInBuf );
     memcpy( fd->fileBuffer+fd->bufferOffset, buf, countInBuf);
     write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    count=count - countInBuf;
+    newBuf =(long *) buf + (countInBuf/8);
     //printf("what is in the buf is: %s\n", fd->fileBuffer);
 
 
     while (count>= BUFFER_SIZE)  {
-      memcpy( fd->fileBuffer, buf, countInBuf);
+      memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
       write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+      newBuf = (long *)newBuf+(BUFFER_SIZE/8);
       count = count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
       fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
@@ -45,10 +50,10 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 
     }
 
-    memcpy( fd->fileBuffer, buf, count);
+    memcpy( fd->fileBuffer, newBuf, count);
     fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
     fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
-    fd->bufferOffset =0;
+    fd->bufferOffset =count;
 
   }
   return 0;  //not sure what to return here
