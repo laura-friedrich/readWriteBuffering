@@ -1,3 +1,4 @@
+
 #include "myio.h"
 
 // Include our header file
@@ -11,95 +12,95 @@
 */
 
 
-struct FileStruct* myflush(struct FileStruct *fd){
+struct FileStruct* myflush(struct FileStruct *fd)  {
   fd->bufferWritten = 0;
   write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
   return fd;
 }
 
-
 //mywrite implementations
-ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count){
+ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 
   fd->bufferWritten = 1;
-  if(BUFFER_SIZE-fd->bufferOffset > count){
+  if(BUFFER_SIZE-fd->bufferOffset > count)  {
     memcpy(fd->fileBuffer+fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset+count;
   }
-  else{
 
+  else  {
     int countInBuf = BUFFER_SIZE-fd->bufferOffset;
     memcpy( fd->fileBuffer+fd->bufferOffset, buf, countInBuf);
-
     write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    //printf("what is in the buf is: %s\n", fd->fileBuffer);
 
-    while (count>= BUFFER_SIZE){
+
+    while (count>= BUFFER_SIZE)  {
       memcpy( fd->fileBuffer, buf, countInBuf);
-
       write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
       count = count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
       fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
+
+      //printf("what is in the buf is: %s", fd->fileBuffer);
+
     }
+
     memcpy( fd->fileBuffer, buf, count);
     fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
     fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
     fd->bufferOffset =0;
 
   }
-
-
   return 0;  //not sure what to return here
-
 }
 
-
 // myread implementations
-ssize_t myread(struct FileStruct *fd, void *buf, size_t count){
+ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
 
-
-
-  if(BUFFER_SIZE - fd->bufferOffset >count){
-
+  void *newBuf;
+  if(BUFFER_SIZE - fd->bufferOffset >count)  {
+    //printf("here");
     memcpy(buf, fd->fileBuffer+fd->bufferOffset, count);
     fd->bufferOffset = fd->bufferOffset+count;
-
   }
-  else{
+
+  else {
+    //printf("NO here");
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
-
     memcpy(buf, fd->fileBuffer+fd->bufferOffset, countInBuf );
-    printf("count before change is %ld \n", count);
-    fflush(stdout);
+    //printf("%p\n", buf);
+    newBuf =(long *) buf + (countInBuf/8);
+    //printf("%p\n", newBuf);
+    //printf("%ld\n", count);
     count= count-countInBuf;
-
+    //printf("%ld\n", count);
     if(fd->bufferWritten==1)  {
       fd->bufferWritten = 0;
       write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-
     }
-
     while(count>=BUFFER_SIZE)  {
       read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-      memcpy(buf, fd->fileBuffer, BUFFER_SIZE);
+      memcpy(newBuf, fd->fileBuffer, BUFFER_SIZE);
+      newBuf = (long *)newBuf+(BUFFER_SIZE/8);
       count=count-BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
       fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
     }
 
-    read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    memcpy(buf, fd->fileBuffer, count);
+    long readBytes = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
+    if (readBytes < count){
+      count = readBytes;
+    }
+    memcpy(newBuf, fd->fileBuffer, count);
     fd->beginningBuff= BUFFER_SIZE+fd->beginningBuff;
     fd->endBuff = fd->beginningBuff+ BUFFER_SIZE;
-    fd->bufferOffset =0;
+    fd->bufferOffset =count;
   }
   return 0;  //not sure what to return here
 }
 
 
-
-// Calls system call open
-struct FileStruct* myopen(char *fileName, int flags){
+struct FileStruct* myopen(char *fileName, int flags)  {
   struct FileStruct *fileStruct = malloc(sizeof(struct FileStruct));
   fileStruct->fileName = fileName;
   fileStruct->bufferOffset = 0;
@@ -112,13 +113,10 @@ struct FileStruct* myopen(char *fileName, int flags){
   return fileStruct;
 }
 
-// Calls system call close
-int myclose(struct FileStruct *fd){
-  if (fd->bufferWritten ==1) {
+int myclose(struct FileStruct *fd)  {
+  if (fd->bufferWritten ==1)  {
     myflush(fd);
   }
-
-
   int returnVal = close(fd->fileDescriptor);
   free(fd);
   return returnVal;

@@ -32,7 +32,6 @@ typedef struct FileStruct{
 struct FileStruct* myopen(char *pathname, int flags);
 
 int myclose(struct FileStruct *fd);
-
 struct FileStruct* myflush(struct FileStruct *fd);
 
 //ssize_t myread(int fd, void *buf, size_t count);
