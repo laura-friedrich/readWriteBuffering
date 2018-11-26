@@ -2,7 +2,9 @@
 #include <stddef.h>
 #include <sys/types.h>
 #include <stdio.h>
+#include <errno.h>
 // Needed for open
+
 #include <fcntl.h>
 #include <sys/stat.h>
 // Needed for close, read
@@ -24,6 +26,8 @@ typedef struct FileStruct{
     int endBuff;
     int bufferOffset;
     int flags;
+    int bytesRead;
+    int bufferLoaded;
     //int position;
     //int bytesWritten;
 }FileStruct;
