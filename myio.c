@@ -23,33 +23,47 @@ struct FileStruct* myflush(struct FileStruct *fd)  {
 //mywrite implementations
 ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
   if (fd->bufferLoaded == 0){
-    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==0){
+    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       perror("read");
     }
     fd->bufferLoaded = 1;
   }
   void *newBuf;
   fd->bufferWritten = 1;
-  if(BUFFER_SIZE-fd->bufferOffset > count)  {
+
+  if(BUFFER_SIZE - fd->bufferOffset > count)  {
     //printf("here\n" );
+    //printf("buffer offset %d\n",fd->bufferOffset );
     memcpy(fd->fileBuffer + fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset + count;
+    //printf("here\n");
   }
 
   else  {
-    int countInBuf = BUFFER_SIZE-fd->bufferOffset;
+    int countInBuf = BUFFER_SIZE - fd->bufferOffset;
+    //printf("count in buf\n %d", countInBuf);
     //printf("%d\n",countInBuf );
+    //char* hello = fd->fileBuffer + fd->bufferOffset/8;
+    //printf("%s\n", hello);
+    //printf(" count in buf else case %d\n",countInBuf);
+    //printf("count is %ld\n", count );
+    //newBuf =(long *) buf + (fd->bufferOffset/8);
+    //memcpy( newBuf, buf, countInBuf);
     memcpy( fd->fileBuffer + fd->bufferOffset, buf, countInBuf);
+    //printf("here2\n");
     if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       perror("write");
     }
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     count=count - countInBuf;
+    printf("count is %ld\n", count );
     newBuf =(long *) buf + (countInBuf/8);
     //printf("what is in the buf is: %s\n", fd->fileBuffer);
 
 
     while (count >= BUFFER_SIZE)  {
+      //printf("count is %ld\n", count);
+      //printf("here?????\n %ld", count);
       memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
         perror("write");
@@ -62,10 +76,13 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
       //printf("what is in the buf is: %s", fd->fileBuffer);
 
     }
-
+    //printf("coun t is  in last area %ld\n", count);
+    //printf("here!\n");
     memcpy( fd->fileBuffer, newBuf, count);
+    //memcpy( fd->fileBuffer+fd->bufferOffset, newBuf, count);
     fd->beginningBuff = BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
+    //myflush(fd);
 
   }
   return 0;  //not sure what to return here
@@ -162,6 +179,7 @@ int myclose(struct FileStruct *fd)  {
   int returnVal = close(fd->fileDescriptor);
   if (returnVal == -1){
     perror("close");
+    printf("file name %s", fd->fileName);
   }
   free(fd);
   return returnVal;
