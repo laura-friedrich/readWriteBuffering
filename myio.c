@@ -22,6 +22,7 @@ struct FileStruct* myflush(struct FileStruct *fd)  {
 
 //mywrite implementations
 ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
+  fd->bytesWritten=0;
   if (fd->bufferLoaded == 0){
     if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       perror("read");
@@ -34,11 +35,13 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
   if(BUFFER_SIZE - fd->bufferOffset > count)  {
     memcpy(fd->fileBuffer + fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset + count;
+    fd->bytesWritten=count;
   }
 
   else  {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     memcpy( fd->fileBuffer + fd->bufferOffset, buf, countInBuf);
+    fd->bytesWritten=countInBuf;
 
     if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       perror("write");
@@ -50,6 +53,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 
     while (count >= BUFFER_SIZE)  {
       memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
+      fd->bytesWritten= fd->bytesWritten + BUFFER_SIZE;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
         perror("write");
       }
@@ -61,12 +65,14 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     memcpy( fd->fileBuffer, newBuf, count);
     fd->beginningBuff = BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
+    fd->bytesWritten= fd->bytesWritten + count;
   }
-  return 0;  //not sure what to return here
+  return fd->bytesWritten;  
 }
 
 // myread implementations
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
+  fd->bytesRead=0;
   if (fd->bufferLoaded == 0){
     if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       perror("read");
@@ -130,6 +136,7 @@ struct FileStruct* myopen(char *fileName, int flags)  {
   fileStruct->beginningBuff=BUFFER_SIZE;
   fileStruct->bytesRead = 0;
   fileStruct->bufferLoaded = 0;
+  fileStruct->bytesWritten =0;
   fileStruct->flags = flags;
   fileStruct->fileDescriptor = open(fileName, flags, 0666);
   if (fileStruct->fileDescriptor == -1) {

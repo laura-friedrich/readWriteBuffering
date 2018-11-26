@@ -28,8 +28,8 @@ typedef struct FileStruct{
     int flags;
     int bytesRead;
     int bufferLoaded;
-    //int position;
-    //int bytesWritten;
+    int bytesWritten;
+  
 }FileStruct;
 
 //int myopen(struct File fd, int flags);
