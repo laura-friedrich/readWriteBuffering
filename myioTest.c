@@ -45,16 +45,34 @@ int main(int argc, char *argv[])
   //printf("file contents %s \n", (char *)bufferToReadTo2);
 
   mywrite(fileToTest3, bufferToReadTo2,400);
-  mywrite(fileToTest3, bufferToReadTo2,3000);
-  mywrite(fileToTest3, bufferToReadTo2,2000);
+  mywrite(fileToTest3, bufferToReadTo2,300);
+  //mywrite(fileToTest3, bufferToReadTo2,2000);
   write(writeFile, bufferToReadTo2, 400);
-  write(writeFile, bufferToReadTo2, 3000);
-  write(writeFile, bufferToReadTo2, 2000);
+  write(writeFile, bufferToReadTo2, 300);
+  //write(writeFile, bufferToReadTo2, 2000);
 
   //myclose(fileToTest);
   myclose(fileToTest2);
   myclose(fileToTest3);
+  close(writeFile);
 
+
+  fileToTest2 = myopen("sourceTest", O_RDONLY);
+  //open("sourceTest", O_RDONLY);
+
+  //Opening Test file to write to
+  fileToTest3 = myopen("test", O_RDWR);
+  writeFile = open("test2", O_RDWR);
+  mywrite(fileToTest3, bufferToReadTo2,400);
+  mywrite(fileToTest3, bufferToReadTo2,300);
+  //mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 400);
+  write(writeFile, bufferToReadTo2, 300);
+  //write(writeFile, bufferToReadTo2, 2000);
+
+  myclose(fileToTest2);
+  myclose(fileToTest3);
+  close(writeFile);
 
   //free both buffers
   //free(bufferToReadTo);
