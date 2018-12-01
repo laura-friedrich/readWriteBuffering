@@ -83,9 +83,11 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //how do i count bytes? becausewhen I call read, I get how many bytes
   //were read but I call read preemptivly thus??? how do i count??
+  int readReturn;
   fd->bytesRead=0;
   if (fd->bufferLoaded == 0){
-    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
+    readReturn = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    if (readReturn==-1){
       fd->error = 2;
     }
     fd->bufferLoaded = 1;
@@ -94,13 +96,23 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   if(BUFFER_SIZE - fd->bufferOffset >count)  {
     memcpy(buf, fd->fileBuffer +  fd->bufferOffset, count);
     fd->bufferOffset = fd->bufferOffset+count;
-    fd->bytesRead = count;
+    if (readReturn<count){
+      fd->bytesRead=readReturn;
+    }
+    else{
+      fd->bytesRead = count;
+    }
   }
 
   else {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
-    fd->bytesRead = countInBuf;
+    if (readReturn<countInBuf){
+      fd->bytesRead=readReturn;
+    }
+    else{
+      fd->bytesRead = countInBuf;
+    }
     newBuf =(long *) buf + (countInBuf/8);
     count= count - countInBuf;
     if(fd->bufferWritten == 1)  {
@@ -111,7 +123,8 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       }
     }
     while(count>=BUFFER_SIZE)  {
-      if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
+      readReturn= read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+      if (readReturn==-1){
         perror("read");
         fd->error = 2;
       }
@@ -119,7 +132,13 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       newBuf = (long *)newBuf + (BUFFER_SIZE/8);
       count=count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
-      fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
+      if (readReturn<count){
+        fd->bytesRead=readReturn+fd->bytesRead;
+      }
+      else{
+        fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
+      }
+
     }
 
     long readBytes = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);

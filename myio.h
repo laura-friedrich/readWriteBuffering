@@ -15,7 +15,7 @@
 
 #ifndef __MYIO_H
 #define __MYIO_H
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 100
 
 typedef struct FileStruct{
     char *fileName;
