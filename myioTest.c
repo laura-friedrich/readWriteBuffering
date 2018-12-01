@@ -44,11 +44,15 @@ int main(int argc, char *argv[])
   //myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
   //printf("file contents %s \n", (char *)bufferToReadTo2);
 
-  mywrite(fileToTest3, bufferToReadTo2,400);
-  mywrite(fileToTest3, bufferToReadTo2,300);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  mywrite(fileToTest3, bufferToReadTo2,3050);
   //mywrite(fileToTest3, bufferToReadTo2,2000);
-  write(writeFile, bufferToReadTo2, 400);
-  write(writeFile, bufferToReadTo2, 300);
+  write(writeFile, bufferToReadTo2, 2000);
+  write(writeFile, bufferToReadTo2, 3050);
+  myread(fileToTest3, bufferToReadTo2, 80);
+  read(writeFile, bufferToReadTo2,80);
+  mywrite(fileToTest3, bufferToReadTo2, 200);
+  write(writeFile, bufferToReadTo2, 200);
   //write(writeFile, bufferToReadTo2, 2000);
 
   //myclose(fileToTest);
@@ -63,11 +67,11 @@ int main(int argc, char *argv[])
   //Opening Test file to write to
   fileToTest3 = myopen("test", O_RDWR);
   writeFile = open("test2", O_RDWR);
-  mywrite(fileToTest3, bufferToReadTo2,400);
-  mywrite(fileToTest3, bufferToReadTo2,300);
+  mywrite(fileToTest3, bufferToReadTo2,4000);
+  mywrite(fileToTest3, bufferToReadTo2,3000);
   //mywrite(fileToTest3, bufferToReadTo2,2000);
-  write(writeFile, bufferToReadTo2, 400);
-  write(writeFile, bufferToReadTo2, 300);
+  write(writeFile, bufferToReadTo2, 4000);
+  write(writeFile, bufferToReadTo2, 3000);
   //write(writeFile, bufferToReadTo2, 2000);
 
   myclose(fileToTest2);

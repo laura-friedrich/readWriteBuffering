@@ -29,7 +29,7 @@ typedef struct FileStruct{
     int bytesRead;
     int bufferLoaded;
     int bytesWritten;
-  
+    int error;
 }FileStruct;
 
 //int myopen(struct File fd, int flags);

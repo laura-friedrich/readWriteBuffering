@@ -14,8 +14,8 @@
 struct FileStruct* myflush(struct FileStruct *fd)  {
   fd->bufferWritten = 0;
   if (write(fd->fileDescriptor, fd->fileBuffer, fd->bufferOffset)==-1){
-    //perror("write");
-    exit(1);
+
+    fd->error = 3;
   }
   fd->beginningBuff= fd->bufferOffset+fd->beginningBuff;
   return fd;
@@ -26,13 +26,11 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
   fd->bytesWritten=0;
   if (fd->bufferLoaded == 0){
     if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
-      //I dont understand how to avoid reading here because I need to potentialll
-      //read or write so I am preemptivly reading into my buffer so if i dont change the whole
-      //buffer size, I can still write the whole buffer to the file at the end
-      //perror("read");
-      exit(1);
+      fd->error = 3;
     }
+
     fd->bufferLoaded = 1;
+    lseek(fd->fileDescriptor, 0, SEEK_SET);
   }
   void *newBuf;
   fd->bufferWritten = 1;
@@ -49,8 +47,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     fd->bytesWritten=countInBuf;
 
     if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
-      //perror("write");
-      exit(1);
+      fd->error = 3;
     }
 
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
@@ -61,8 +58,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
       memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
       fd->bytesWritten= fd->bytesWritten + BUFFER_SIZE;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
-        //perror("write");
-        exit(1);
+        fd->error = 3;
       }
       newBuf = (long *)newBuf + (BUFFER_SIZE/8);
       count = count - BUFFER_SIZE;
@@ -74,7 +70,13 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     fd->bufferOffset = count;
     fd->bytesWritten= fd->bytesWritten + count;
   }
-  return fd->bytesWritten;
+  if (fd->error == 3){
+    fd->error = 0;
+    return 3;
+  }
+  else{
+    return fd->bytesWritten;
+  }
 }
 
 // myread implementations
@@ -84,8 +86,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   fd->bytesRead=0;
   if (fd->bufferLoaded == 0){
     if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
-      //perror("read");
-      exit(1);
+      fd->error = 2;
     }
     fd->bufferLoaded = 1;
   }
@@ -106,13 +107,13 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       fd->bufferWritten = 0;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
         //perror("write");
-        exit(1);
+        fd->error = 2;
       }
     }
     while(count>=BUFFER_SIZE)  {
       if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
         perror("read");
-        exit(1);
+        fd->error = 2;
       }
       memcpy(newBuf, fd->fileBuffer, BUFFER_SIZE);
       newBuf = (long *)newBuf + (BUFFER_SIZE/8);
@@ -124,7 +125,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     long readBytes = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
     if (readBytes == -1){
       //perror("read");
-      exit(1);
+      fd->error = 2;
     }
     if (readBytes < count){
       count = readBytes;
@@ -134,14 +135,19 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
   }
-  return fd->bytesRead;
+  if (fd->error == 2){
+    fd->error = 0;
+    return 2;
+  }
+  else{
+    return fd->bytesRead;
+  }
 }
 
 
 struct FileStruct* myopen(char *fileName, int flags)  {
   struct FileStruct *fileStruct = malloc(sizeof(struct FileStruct));
   if (fileStruct == NULL){
-    //perror("malloc");
     exit(1);
   }
   fileStruct->fileName = fileName;
@@ -153,12 +159,16 @@ struct FileStruct* myopen(char *fileName, int flags)  {
   fileStruct->bytesWritten =0;
   fileStruct->flags = flags;
   fileStruct->fileDescriptor = open(fileName, flags, 0666);
+  fileStruct->error = 0;
   if (fileStruct->fileDescriptor == -1) {
     free(fileStruct);
-    //perror("open");
     exit(1);
+
   }
-  return fileStruct;
+
+    return fileStruct;
+
+
 }
 
 int myclose(struct FileStruct *fd)  {
@@ -167,8 +177,7 @@ int myclose(struct FileStruct *fd)  {
   }
   int returnVal = close(fd->fileDescriptor);
   if (returnVal == -1){
-    //perror("close");
-    exit(1);
+    fd->error = 4;
   }
   free(fd);
   return returnVal;
