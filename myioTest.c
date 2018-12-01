@@ -44,22 +44,23 @@ int main(int argc, char *argv[])
   //myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
   //printf("file contents %s \n", (char *)bufferToReadTo2);
 
-  mywrite(fileToTest3, bufferToReadTo2,200);
-  //mywrite(fileToTest3, bufferToReadTo2,305);
-  //mywrite(fileToTest3, bufferToReadTo2,200);
-  write(writeFile, bufferToReadTo2, 200);
-  //write(writeFile, bufferToReadTo2, 305);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  mywrite(fileToTest3, bufferToReadTo2,3060);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2000);
+  write(writeFile, bufferToReadTo2, 3060);
+  write(writeFile, bufferToReadTo2, 2000);
   //myread(fileToTest3, bufferToReadTo2, 80);
   //read(writeFile, bufferToReadTo2,80);
   //mywrite(fileToTest3, bufferToReadTo2, 200);
-  //write(writeFile, bufferToReadTo2, 200);
+
 
   //write(writeFile, bufferToReadTo2, 200);
 
   //myclose(fileToTest);
   //myclose(fileToTest2);
-  myclose(fileToTest3);
-  close(writeFile);
+  //myclose(fileToTest3);
+  //close(writeFile);
 
 
   //fileToTest2 = myopen("sourceTest", O_RDONLY);

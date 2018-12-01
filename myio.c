@@ -36,9 +36,11 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
   fd->bufferWritten = 1;
 
   if(BUFFER_SIZE - fd->bufferOffset > count)  {
+
     memcpy(fd->fileBuffer + fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset + count;
     fd->bytesWritten=count;
+
   }
 
   else  {
@@ -55,16 +57,19 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     newBuf =(long *) buf + (countInBuf/8);
 
     while (count >= BUFFER_SIZE)  {
+
       memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
       fd->bytesWritten= fd->bytesWritten + BUFFER_SIZE;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
         fd->error = 3;
       }
       newBuf = (long *)newBuf + (BUFFER_SIZE/8);
+
       count = count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
       fd->endBuff = fd->beginningBuff + BUFFER_SIZE;
     }
+    
     memcpy( fd->fileBuffer, newBuf, count);
     fd->beginningBuff = BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
@@ -83,11 +88,9 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //how do i count bytes? becausewhen I call read, I get how many bytes
   //were read but I call read preemptivly thus??? how do i count??
-  int readReturn;
   fd->bytesRead=0;
   if (fd->bufferLoaded == 0){
-    readReturn = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    if (readReturn==-1){
+    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       fd->error = 2;
     }
     fd->bufferLoaded = 1;
@@ -96,23 +99,13 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   if(BUFFER_SIZE - fd->bufferOffset >count)  {
     memcpy(buf, fd->fileBuffer +  fd->bufferOffset, count);
     fd->bufferOffset = fd->bufferOffset+count;
-    if (readReturn<count){
-      fd->bytesRead=readReturn;
-    }
-    else{
-      fd->bytesRead = count;
-    }
+    fd->bytesRead = count;
   }
 
   else {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
-    if (readReturn<countInBuf){
-      fd->bytesRead=readReturn;
-    }
-    else{
-      fd->bytesRead = countInBuf;
-    }
+    fd->bytesRead = countInBuf;
     newBuf =(long *) buf + (countInBuf/8);
     count= count - countInBuf;
     if(fd->bufferWritten == 1)  {
@@ -123,8 +116,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       }
     }
     while(count>=BUFFER_SIZE)  {
-      readReturn= read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-      if (readReturn==-1){
+      if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
         perror("read");
         fd->error = 2;
       }
@@ -132,13 +124,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       newBuf = (long *)newBuf + (BUFFER_SIZE/8);
       count=count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
-      if (readReturn<count){
-        fd->bytesRead=readReturn+fd->bytesRead;
-      }
-      else{
-        fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
-      }
-
+      fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
     }
 
     long readBytes = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
