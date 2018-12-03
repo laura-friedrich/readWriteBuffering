@@ -32,7 +32,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     fd->bufferLoaded = 1;
     lseek(fd->fileDescriptor, 0, SEEK_SET);
   }
-  void *newBuf;
+  //void *newBuf;
   fd->bufferWritten = 1;
 
   if(BUFFER_SIZE - fd->bufferOffset > count)  {
@@ -54,23 +54,23 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     count=count - countInBuf;
-    newBuf =(long *) buf + (countInBuf/8);
+    buf =(char *) buf + countInBuf;
 
     while (count >= BUFFER_SIZE)  {
 
-      memcpy( fd->fileBuffer, newBuf,BUFFER_SIZE);
+      memcpy( fd->fileBuffer, buf,BUFFER_SIZE);
       fd->bytesWritten= fd->bytesWritten + BUFFER_SIZE;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
         fd->error = 3;
       }
-      newBuf = (long *)newBuf + (BUFFER_SIZE/8);
+      buf = (char *)buf + BUFFER_SIZE;
 
       count = count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
       fd->endBuff = fd->beginningBuff + BUFFER_SIZE;
     }
-    
-    memcpy( fd->fileBuffer, newBuf, count);
+
+    memcpy( fd->fileBuffer, buf, count);
     fd->beginningBuff = BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
     fd->bytesWritten= fd->bytesWritten + count;
@@ -95,7 +95,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     }
     fd->bufferLoaded = 1;
   }
-  void *newBuf;
+  //void *newBuf;
   if(BUFFER_SIZE - fd->bufferOffset >count)  {
     memcpy(buf, fd->fileBuffer +  fd->bufferOffset, count);
     fd->bufferOffset = fd->bufferOffset+count;
@@ -106,7 +106,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
     fd->bytesRead = countInBuf;
-    newBuf =(long *) buf + (countInBuf/8);
+    buf =(char *) buf + countInBuf;
     count= count - countInBuf;
     if(fd->bufferWritten == 1)  {
       fd->bufferWritten = 0;
@@ -120,8 +120,8 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
         perror("read");
         fd->error = 2;
       }
-      memcpy(newBuf, fd->fileBuffer, BUFFER_SIZE);
-      newBuf = (long *)newBuf + (BUFFER_SIZE/8);
+      memcpy(buf, fd->fileBuffer, BUFFER_SIZE);
+      buf = (char *)buf + BUFFER_SIZE;
       count=count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
       fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
@@ -135,7 +135,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     if (readBytes < count){
       count = readBytes;
     }
-    memcpy(newBuf, fd->fileBuffer, count);
+    memcpy(buf, fd->fileBuffer, count);
     fd->bytesRead = count + fd->bytesRead;
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;

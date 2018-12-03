@@ -13,12 +13,12 @@ int main(int argc, char *argv[])
   //FileStruct *fileToTest = myopen("sourceTest", O_RDONLY);
 
   //Opening myio.h
-  FileStruct *fileToTest2 = myopen("sourceTest", O_RDONLY);
+  FileStruct *fileToTest2 = myopen("sourceTest", O_CREAT | O_RDONLY);
   //open("sourceTest", O_RDONLY);
 
   //Opening Test file to write to
-  FileStruct *fileToTest3 = myopen("test", O_RDWR);
-  int writeFile = open("test2", O_RDWR);
+  FileStruct *fileToTest3 = myopen("test", O_CREAT | O_RDWR);
+  int writeFile = open("test2", O_CREAT | O_RDWR, 0666);
   //FileStruct *fileToTest4 = myopen("test2", O_RDWR);
 
   //Reading README
@@ -44,31 +44,29 @@ int main(int argc, char *argv[])
   //myread(fileToTest2, (char *)bufferToReadTo2 + 100,100);
   //printf("file contents %s \n", (char *)bufferToReadTo2);
 
-  mywrite(fileToTest3, bufferToReadTo2,2000);
+  mywrite(fileToTest3, bufferToReadTo2,2050);
   mywrite(fileToTest3, bufferToReadTo2,3060);
-  mywrite(fileToTest3, bufferToReadTo2,2000);
-  write(writeFile, bufferToReadTo2, 2000);
+  //mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2050);
   write(writeFile, bufferToReadTo2, 3060);
-  write(writeFile, bufferToReadTo2, 2000);
+  //write(writeFile, bufferToReadTo2, 2000);
   //myread(fileToTest3, bufferToReadTo2, 80);
   //read(writeFile, bufferToReadTo2,80);
-  //mywrite(fileToTest3, bufferToReadTo2, 200);
-
-
-  //write(writeFile, bufferToReadTo2, 200);
+  mywrite(fileToTest3, bufferToReadTo2, 200);
+  write(writeFile, bufferToReadTo2, 200);
 
   //myclose(fileToTest);
-  //myclose(fileToTest2);
-  //myclose(fileToTest3);
-  //close(writeFile);
+  myclose(fileToTest2);
+  myclose(fileToTest3);
+  close(writeFile);
 
 
-  //fileToTest2 = myopen("sourceTest", O_RDONLY);
-  //open("sourceTest", O_RDONLY);
+  fileToTest2 = myopen("sourceTest", O_RDONLY);
+  open("sourceTest", O_RDONLY);
 
   //Opening Test file to write to
 
-  /*
+
   fileToTest3 = myopen("test", O_RDWR);
   writeFile = open("test2", O_RDWR);
   mywrite(fileToTest3, bufferToReadTo2,400);
@@ -77,7 +75,7 @@ int main(int argc, char *argv[])
   write(writeFile, bufferToReadTo2, 400);
   write(writeFile, bufferToReadTo2, 300);
   write(writeFile, bufferToReadTo2, 250);
-  */
+
 
   myclose(fileToTest2);
   myclose(fileToTest3);

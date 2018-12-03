@@ -11,4 +11,4 @@ myioTest: myioTest.o myio.o
 
 .PHONY: clean
 clean:
-	rm -f myioTest myioTest.o myio.o
+	rm -f myioTest myioTest.o myio.o test test2
