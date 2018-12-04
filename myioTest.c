@@ -4,13 +4,13 @@ int main(int argc, char *argv[])
 
 {
   //fflush(stdout);
-  //void *bufferToReadTo = malloc(10000);
+  void *bufferToReadTo = malloc(10000);
   void *bufferToReadTo2 = malloc(10000);
 
   //Have two open files at once
 
   //opening README
-  //FileStruct *fileToTest = myopen("sourceTest", O_RDONLY);
+  FileStruct *fileToTest = myopen("sourceTest", O_RDONLY);
 
   //Opening myio.h
   FileStruct *fileToTest2 = myopen("sourceTest", O_CREAT | O_RDONLY);
@@ -22,16 +22,21 @@ int main(int argc, char *argv[])
   //FileStruct *fileToTest4 = myopen("test2", O_RDWR);
 
   //Reading README
-//  myread(fileToTest, bufferToReadTo, 100);
+  myread(fileToTest, bufferToReadTo, 2000);
+  read(open("sourceTest", O_RDONLY), bufferToReadTo2,2000);
+  int compValue = memcmp(bufferToReadTo, bufferToReadTo2, 9000);
+  printf("%d", compValue);
+  //read(fileToTest2, bufferToReadTo2,100);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
+  //printf("file contents %s \n\n\n", (char *)bufferToReadTo2);
 
   //continue reading from the file but without calling another system call
   //myread(fileToTest, (char *)bufferToReadTo+100, 100);
 
-
+/*
   //Reading myio.h
   myread(fileToTest2, bufferToReadTo2, 8000);
-  //read(open("sourceTest", O_RDONLY), bufferToReadTo,8000);
+  read(open("sourceTest", O_RDONLY), bufferToReadTo,8000);
 
 
   //int compValue = memcmp(bufferToReadTo, bufferToReadTo2, 8000);
@@ -46,10 +51,10 @@ int main(int argc, char *argv[])
 
   mywrite(fileToTest3, bufferToReadTo2,2050);
   mywrite(fileToTest3, bufferToReadTo2,3060);
-  //mywrite(fileToTest3, bufferToReadTo2,2000);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
   write(writeFile, bufferToReadTo2, 2050);
   write(writeFile, bufferToReadTo2, 3060);
-  //write(writeFile, bufferToReadTo2, 2000);
+  write(writeFile, bufferToReadTo2, 2000);
   //myread(fileToTest3, bufferToReadTo2, 80);
   //read(writeFile, bufferToReadTo2,80);
   mywrite(fileToTest3, bufferToReadTo2, 200);
@@ -76,7 +81,7 @@ int main(int argc, char *argv[])
   write(writeFile, bufferToReadTo2, 300);
   write(writeFile, bufferToReadTo2, 250);
 
-
+*/
   myclose(fileToTest2);
   myclose(fileToTest3);
   close(writeFile);
