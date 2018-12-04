@@ -21,9 +21,14 @@ int main(int argc, char *argv[])
   int writeFile = open("test2", O_CREAT | O_RDWR, 0666);
   //FileStruct *fileToTest4 = myopen("test2", O_RDWR);
 
+  int fileToRead = open("sourceTest", O_RDONLY);
+
   //Reading README
   myread(fileToTest, bufferToReadTo, 2000);
-  read(open("sourceTest", O_RDONLY), bufferToReadTo2,2000);
+  read(fileToRead, bufferToReadTo2,2000);
+  read(fileToRead, (char *)bufferToReadTo2 +2000,4000);
+  myread(fileToTest, (char *) bufferToReadTo +2000, 4000);
+
   int compValue = memcmp(bufferToReadTo, bufferToReadTo2, 9000);
   printf("%d", compValue);
   //read(fileToTest2, bufferToReadTo2,100);

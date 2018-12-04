@@ -23,11 +23,9 @@ struct FileStruct* myflush(struct FileStruct *fd)  {
 
 //mywrite implementations
 ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
-  int bytesWritten;
-  int bytesRead;
+  fd->bytesWritten=0;
   if (fd->bufferLoaded == 0){
-    bytesRead = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    if (bytesRead==-1){
+    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       fd->error = 3;
     }
 
@@ -41,14 +39,14 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 
     memcpy(fd->fileBuffer + fd->bufferOffset, buf, count);
     fd->bufferOffset = fd->bufferOffset + count;
-    bytesWritten=count;
+    fd->bytesWritten=count;
 
   }
 
   else  {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     memcpy( fd->fileBuffer + fd->bufferOffset, buf, countInBuf);
-    bytesWritten=countInBuf;
+    fd->bytesWritten=countInBuf;
 
     if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       fd->error = 3;
@@ -61,7 +59,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     while (count >= BUFFER_SIZE)  {
 
       memcpy( fd->fileBuffer, buf,BUFFER_SIZE);
-      bytesWritten = bytesWritten + BUFFER_SIZE;
+      fd->bytesWritten= fd->bytesWritten + BUFFER_SIZE;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE) == -1){
         fd->error = 3;
       }
@@ -75,14 +73,14 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     memcpy( fd->fileBuffer, buf, count);
     fd->beginningBuff = BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
-    bytesWritten= bytesWritten + count;
+    fd->bytesWritten= fd->bytesWritten + count;
   }
   if (fd->error == 3){
     fd->error = 0;
     return 3;
   }
   else{
-    return bytesWritten;
+    return fd->bytesWritten;
   }
 }
 
@@ -90,11 +88,9 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
 ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //how do i count bytes? becausewhen I call read, I get how many bytes
   //were read but I call read preemptivly thus??? how do i count??
-  int bytesRead;
-  int readReturnVal;
+  fd->bytesRead=0;
   if (fd->bufferLoaded == 0){
-    readReturnVal = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    if (readReturnVal == -1){
+    if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       fd->error = 2;
     }
     fd->bufferLoaded = 1;
@@ -103,18 +99,15 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   if(BUFFER_SIZE - fd->bufferOffset >count)  {
     memcpy(buf, fd->fileBuffer +  fd->bufferOffset, count);
     fd->bufferOffset = fd->bufferOffset+count;
-    if (readReturnVal>count){
-      bytesRead = count;
-    }
-    else {
-      bytesRead = readReturnVal;
-    }
-
+    fd->bytesRead = count;
   }
 
   else {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
-    memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf);
+    memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
+    fd->bytesRead = countInBuf;
+    buf =(char *) buf + countInBuf;
+    count= count - countInBuf;
     if(fd->bufferWritten == 1)  {
       fd->bufferWritten = 0;
       if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
@@ -122,27 +115,8 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
         fd->error = 2;
       }
     }
-    if (readReturnVal-fd->bufferOffset>count){
-      bytesRead = countInBuf;
-      buf =(char *) buf + countInBuf;
-      count= count - countInBuf;
-    }
-    else {
-      bytesRead = readReturnVal;
-      if (fd->error == 2){
-        fd->error = 0;
-        return 2;
-      }
-      else{
-        return bytesRead;
-      }
-
-    }
-
-
     while(count>=BUFFER_SIZE)  {
-      readReturnVal=read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-      if (readReturnVal==-1){
+      if (read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
         perror("read");
         fd->error = 2;
       }
@@ -150,17 +124,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
       buf = (char *)buf + BUFFER_SIZE;
       count=count - BUFFER_SIZE;
       fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
-      bytesRead = readReturnVal + bytesRead;
-      if (readReturnVal<BUFFER_SIZE){
-        if (fd->error == 2){
-          fd->error = 0;
-          return 2;
-        }
-        else{
-          return bytesRead;
-        }
-
-      }
+      fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
     }
 
     long readBytes = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
