@@ -140,7 +140,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     buf =(char *) buf + countInBuf;
     count= count - countInBuf;
     //printf("%s\n", fd->fileBuffer);
-    if(fd->bufferWritten == 1)  {
+    if(fd->bufferWritten == 1 && fd->bufferOffset !=0)  {
       fd->bufferWritten = 0;
       //printf("here3\n");
       fflush(stdout);
