@@ -4,16 +4,13 @@ int main(int argc, char *argv[])
 
 {
   //fflush(stdout);
-  void *bufferToReadTo = malloc(10000);
+  //void *bufferToReadTo = malloc(10000);
   void *bufferToReadTo2 = malloc(10000);
 
   //Have two open files at once
 
   //opening README
-  FileStruct *fileToTest = myopen("sourceTest", O_RDONLY);
-
-  //Opening myio.h
-  FileStruct *fileToTest2 = myopen("sourceTest", O_CREAT | O_RDONLY);
+  //FileStruct *fileToTest2 = myopen("sourceTest", O_CREAT | O_RDONLY);
   //open("sourceTest", O_RDONLY);
 
   //Opening Test file to write to
@@ -23,14 +20,74 @@ int main(int argc, char *argv[])
 
   int fileToRead = open("sourceTest", O_RDONLY);
 
+  read(fileToRead,bufferToReadTo2,10);
+
+
+    /*
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2000);
+  myread(fileToTest3, bufferToReadTo2,2000);
+  read(writeFile, bufferToReadTo2, 2000);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2000);
+  */
+  myread(fileToTest3,bufferToReadTo2,3);
+  read(writeFile, bufferToReadTo2, 3);
+
+  mywrite(fileToTest3,(char *) bufferToReadTo2+2,4);
+  mywrite(fileToTest3, bufferToReadTo2,9);
+  //mywrite(fileToTest3, bufferToReadTo2,9);
+  write(writeFile, (char*) bufferToReadTo2+2, 4);
+
+
+  write(writeFile, bufferToReadTo2, 9);
+  //write(writeFile, bufferToReadTo2, 9);
+  myread(fileToTest3,bufferToReadTo2,4);
+  read(writeFile, bufferToReadTo2, 4);
+  //myread(fileToTest3, bufferToReadTo2, 2);
+  //read(writeFile, bufferToReadTo2,2);
+  mywrite(fileToTest3, bufferToReadTo2, 2);
+  write(writeFile, bufferToReadTo2, 2);
+
   //Reading README
-  myread(fileToTest, bufferToReadTo, 2000);
-  read(fileToRead, bufferToReadTo2,2000);
-  read(fileToRead, (char *)bufferToReadTo2 +2000,4000);
-  myread(fileToTest, (char *) bufferToReadTo +2000, 4000);
+
+
+  /*read(fileToRead,bufferToReadTo2,200);
+  myread(fileToTest, bufferToReadTo, 200);
+  myread(fileToTest, (char *) bufferToReadTo+200, 2000);
+  read(fileToRead, (char *) bufferToReadTo2 +200,2000);
+  read(fileToRead, (char *)bufferToReadTo2 +2200,6000);
+  myread(fileToTest, (char *) bufferToReadTo +2200, 6000);
+
+
+
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2000);
+  myread(fileToTest3, bufferToReadTo2,2000);
+  read(writeFile, bufferToReadTo2, 2000);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2000);
+
+  //myread(fileToTest3,bufferToReadTo2,200);
+  //read(writeFile, bufferToReadTo, 200);
+
+  mywrite(fileToTest3, bufferToReadTo2,2050);
+  mywrite(fileToTest3, bufferToReadTo2,3060);
+  mywrite(fileToTest3, bufferToReadTo2,2000);
+  write(writeFile, bufferToReadTo2, 2050);
+  write(writeFile, bufferToReadTo2, 3060);
+  write(writeFile, bufferToReadTo2, 2000);
+  myread(fileToTest3, bufferToReadTo2, 200);
+  read(writeFile, bufferToReadTo,200);
+  mywrite(fileToTest3, bufferToReadTo2, 200);
+  write(writeFile, bufferToReadTo2, 200);
+
 
   int compValue = memcmp(bufferToReadTo, bufferToReadTo2, 9000);
   printf("%d", compValue);
+
+  */
+
   //read(fileToTest2, bufferToReadTo2,100);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo);
   //printf("file contents %s \n\n\n", (char *)bufferToReadTo2);
@@ -87,7 +144,7 @@ int main(int argc, char *argv[])
   write(writeFile, bufferToReadTo2, 250);
 
 */
-  myclose(fileToTest2);
+  //myclose(fileToTest2);
   myclose(fileToTest3);
   close(writeFile);
 
