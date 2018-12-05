@@ -65,6 +65,7 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
     if (write(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE)==-1){
       fd->error = 3;
     }
+    fd->lseekVal = 0;//might get rid of this
     fd->bufferWritten = 0; //New line might not work
 
     fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
@@ -107,10 +108,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //how do i count bytes? becausewhen I call read, I get how many bytes
   //were read but I call read preemptivly thus??? how do i count?
   //int countInitial = count;
-  if (fd->lseekVal ==1){
-    fd->lseekVal=0;
-    lseek(fd->fileDescriptor, ( BUFFER_SIZE), SEEK_CUR);
-  }
+
   int returnVal;
   //puts("now in myread");
   if (fd->bufferLoaded == 0){
@@ -134,6 +132,10 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   }
 
   else {
+    if (fd->lseekVal ==1){
+      fd->lseekVal=0;
+      lseek(fd->fileDescriptor,BUFFER_SIZE, SEEK_CUR);
+    }
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
     //if (countInBuf>fd->bytesLeftInBuffer){
       //countInBuf = fd->bytesLeftInBuffer;

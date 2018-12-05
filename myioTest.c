@@ -35,11 +35,13 @@ int main(int argc, char *argv[])
 
   myread(fileToTest2,bufferToReadTo2,3);
   read(fileToRead, bufferToReadTo, 3);
-  myread(fileToTest2,bufferToReadTo2,5);
-  read(fileToRead, bufferToReadTo, 5);
-  myread(fileToTest2,bufferToReadTo2,3);
-  read(fileToRead, bufferToReadTo, 3);
+  myread(fileToTest2,(char *)bufferToReadTo2+3,5);
+  read(fileToRead,(char *) bufferToReadTo+3, 5);
+  myread(fileToTest2,(char *)bufferToReadTo2 +8,13);
+  read(fileToRead, (char *)bufferToReadTo +8, 13);
 
+  printf("my string is %s \n",(char *) bufferToReadTo2);
+  printf("The Correctstring is %s \n", (char *)bufferToReadTo);
   int compValue = memcmp(bufferToReadTo, bufferToReadTo2, 9000);
   printf("%d", compValue);
 
