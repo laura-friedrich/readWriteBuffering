@@ -30,6 +30,7 @@ typedef struct FileStruct{
     int bufferLoaded;
     int bytesWritten;
     int error;
+    int lseekVal;
 }FileStruct;
 
 //int myopen(struct File fd, int flags);

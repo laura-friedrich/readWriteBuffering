@@ -107,7 +107,12 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //how do i count bytes? becausewhen I call read, I get how many bytes
   //were read but I call read preemptivly thus??? how do i count?
   //int countInitial = count;
+  if (fd->lseekVal ==1){
+    fd->lseekVal=0;
+    lseek(fd->fileDescriptor, ( BUFFER_SIZE), SEEK_CUR);
+  }
   int returnVal;
+  //puts("now in myread");
   if (fd->bufferLoaded == 0){
     fd->bytesLeftInBuffer = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
     //printf("%d\n", fd->bytesLeftInBuffer);
@@ -130,10 +135,10 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
 
   else {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
-    if (countInBuf>fd->bytesLeftInBuffer){
-      countInBuf = fd->bytesLeftInBuffer;
-      count=0;
-    }
+    //if (countInBuf>fd->bytesLeftInBuffer){
+      //countInBuf = fd->bytesLeftInBuffer;
+      //count=0; //maybe dont want this??
+    //}
     memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
     returnVal=countInBuf;
     fd->bytesLeftInBuffer = 0; //this is wrong  change to fd->bytesRemaininBuf
@@ -191,6 +196,7 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     //printf("return val is %d", returnVal);
     //printf("here\n");
     lseek(fd->fileDescriptor, (-1 * BUFFER_SIZE), SEEK_CUR);
+    fd->lseekVal = 1; //not sure about this
   }
   //lseek(with countinitial if countinitial is > returnVal)
   if (fd->error == 2){
@@ -218,6 +224,7 @@ struct FileStruct* myopen(char *fileName, int flags)  {
   fileStruct->flags = flags;
   fileStruct->fileDescriptor = open(fileName, flags, 0666);
   fileStruct->error = 0;
+  fileStruct->lseekVal = 0;
   if (fileStruct->fileDescriptor == -1) {
     free(fileStruct);
     exit(1);
