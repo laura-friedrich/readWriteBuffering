@@ -180,13 +180,15 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     }
     memcpy(buf, fd->fileBuffer, count);
     returnVal = returnVal + count;
-    fd->bytesRead = count + fd->bytesRead;
+    ///fd->bytesRead = count + fd->bytesRead;
     //fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
   }
   //printf("return val is %d", returnVal);
-  if (returnVal%BUFFER_SIZE != 0){
+  if (fd->bytesRead != 0){
+  //if (returnVal%BUFFER_SIZE != 0){
     //lseek()
+    //printf("return val is %d", returnVal);
     //printf("here\n");
     lseek(fd->fileDescriptor, (-1 * BUFFER_SIZE), SEEK_CUR);
   }

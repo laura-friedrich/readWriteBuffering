@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
   mywrite(fileToTest3, bufferToReadTo2,2000);
   write(writeFile, bufferToReadTo2, 2000);
   */
+
   myread(fileToTest3,bufferToReadTo2,3);
   read(writeFile, bufferToReadTo2, 3);
 
@@ -48,6 +49,10 @@ int main(int argc, char *argv[])
   //read(writeFile, bufferToReadTo2,2);
   mywrite(fileToTest3, bufferToReadTo2, 2);
   write(writeFile, bufferToReadTo2, 2);
+
+  myread(fileToTest3, bufferToReadTo2, 2);
+  read(writeFile, bufferToReadTo2,2);
+
 
   //Reading README
 
