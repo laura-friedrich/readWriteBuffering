@@ -36,10 +36,10 @@ ssize_t mywrite(struct FileStruct *fd, const void *buf, size_t count)  {
   fd->bytesWritten=0;
   if (fd->bufferLoaded == 0){
 
-    fd->bytesRead =read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    //printf("fd->bytes read at beginning of myWrite is %d\n", fd->bytesRead);
+    fd->bytesLeftInBuffer =read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    //printf("fd->bytes read at beginning of myWrite is %d\n", fd->bytesLeftInBuffer);
     //printf("file buffer here is%s\n", fd->fileBuffer);
-    if (fd->bytesRead==-1){
+    if (fd->bytesLeftInBuffer==-1){
       fd->error = 3;
     }
 
@@ -109,34 +109,34 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
   //int countInitial = count;
   int returnVal;
   if (fd->bufferLoaded == 0){
-    fd->bytesRead = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-    //printf("%d\n", fd->bytesRead);
+    fd->bytesLeftInBuffer = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+    //printf("%d\n", fd->bytesLeftInBuffer);
     fd->bufferOffset = 0;
-    if (fd->bytesRead==-1){
+    if (fd->bytesLeftInBuffer==-1){
       fd->error = 2;
     }
     fd->bufferLoaded = 1;
   }
   //void *newBuf;
   if(BUFFER_SIZE - fd->bufferOffset >count)  {
-    if (count>fd->bytesRead) {
-      count = fd->bytesRead;
+    if (count>fd->bytesLeftInBuffer) {
+      count = fd->bytesLeftInBuffer;
     }
     memcpy(buf, fd->fileBuffer +  fd->bufferOffset, count);
     returnVal = count;
     fd->bufferOffset = fd->bufferOffset+count;
-    fd->bytesRead = fd->bytesRead - count;
+    fd->bytesLeftInBuffer = fd->bytesLeftInBuffer - count;
   }
 
   else {
     int countInBuf = BUFFER_SIZE - fd->bufferOffset;
-    if (countInBuf>fd->bytesRead){
-      countInBuf = fd->bytesRead;
+    if (countInBuf>fd->bytesLeftInBuffer){
+      countInBuf = fd->bytesLeftInBuffer;
       count=0;
     }
     memcpy(buf, fd->fileBuffer + fd->bufferOffset, countInBuf );
     returnVal=countInBuf;
-    fd->bytesRead = countInBuf;
+    fd->bytesLeftInBuffer = 0; //this is wrong  change to fd->bytesRemaininBuf
     buf =(char *) buf + countInBuf;
     count= count - countInBuf;
     //printf("%s\n", fd->fileBuffer);
@@ -153,39 +153,39 @@ ssize_t myread(struct FileStruct *fd, void *buf, size_t count)  {
     }
     while(count>=BUFFER_SIZE)  {
       //printf("hereeeeeeee\n");
-      fd->bytesRead = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
-      if (fd->bytesRead==-1){
+      fd->bytesLeftInBuffer = read(fd->fileDescriptor, fd->fileBuffer, BUFFER_SIZE);
+      if (fd->bytesLeftInBuffer==-1){
         fd->error = 2;
       }
-      memcpy(buf, fd->fileBuffer, fd->bytesRead);
-      returnVal = returnVal+fd->bytesRead;
-      buf = (char *)buf + fd->bytesRead;
-      if(fd->bytesRead==0){
+      memcpy(buf, fd->fileBuffer, fd->bytesLeftInBuffer);
+      returnVal = returnVal+fd->bytesLeftInBuffer;
+      buf = (char *)buf + fd->bytesLeftInBuffer;
+      if(fd->bytesLeftInBuffer==0){
         count = 0;
       }
       else{
-        count = count - fd->bytesRead;
+        count = count - fd->bytesLeftInBuffer;
       }
       //fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
-      //fd->bytesRead = BUFFER_SIZE + fd->bytesRead;
+      //fd->bytesLeftInBuffer = BUFFER_SIZE + fd->bytesLeftInBuffer;
     }
 
-    fd->bytesRead = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
-    if (fd->bytesRead == -1){
+    fd->bytesLeftInBuffer = read(fd->fileDescriptor,fd->fileBuffer, BUFFER_SIZE);
+    if (fd->bytesLeftInBuffer == -1){
       //perror("read");
       fd->error = 2;
     }
-    if (fd->bytesRead < count){
-      count = fd->bytesRead;
+    if (fd->bytesLeftInBuffer < count){
+      count = fd->bytesLeftInBuffer;
     }
     memcpy(buf, fd->fileBuffer, count);
     returnVal = returnVal + count;
-    ///fd->bytesRead = count + fd->bytesRead;
+    ///fd->bytesLeftInBuffer = count + fd->bytesLeftInBuffer;
     //fd->beginningBuff= BUFFER_SIZE + fd->beginningBuff;
     fd->bufferOffset = count;
   }
   //printf("return val is %d", returnVal);
-  if (fd->bytesRead != 0){
+  if (fd->bytesLeftInBuffer != 0){
   //if (returnVal%BUFFER_SIZE != 0){
     //lseek()
     //printf("return val is %d", returnVal);
@@ -212,7 +212,7 @@ struct FileStruct* myopen(char *fileName, int flags)  {
   fileStruct->bufferOffset = 0;
   fileStruct->bufferWritten = 0;
   fileStruct->beginningBuff=BUFFER_SIZE;
-  fileStruct->bytesRead = 0;
+  fileStruct->bytesLeftInBuffer = 0;
   fileStruct->bufferLoaded = 0;
   fileStruct->bytesWritten =0;
   fileStruct->flags = flags;

@@ -26,7 +26,7 @@ typedef struct FileStruct{
     int endBuff;
     int bufferOffset;
     int flags;
-    int bytesRead;
+    int bytesLeftInBuffer;
     int bufferLoaded;
     int bytesWritten;
     int error;
